@@ -5,15 +5,17 @@ ProjectItem::ProjectItem(QVariantList data, ProjectItem *parentItem)
     , parent(parentItem)
 {}
 
-void ProjectItem::appendChildItem(ProjectItem child)
+void ProjectItem::appendChildItem(std::unique_ptr<ProjectItem> &&child)
+//void ProjectItem::appendChildItem(ProjectItem *child)
 {
-    children.append(child);
+    children.push_back(std::move(child));
+    // children.append(child);
 }
 
 ProjectItem *ProjectItem::childItem(int row) const
 {
     if (row >= 0 && row < childCount()) {
-        return const_cast<ProjectItem *>(&children[row]);
+        return children[row].get();
     }
     return nullptr;
 }
@@ -41,9 +43,8 @@ int ProjectItem::row() const
     if (parent == nullptr)
         return row;
 
-    QList<ProjectItem> chillun = parent->children;
-    for (int i = 1; i < chillun.length(); i++) {
-        if (this == &chillun[i]) {
+    for (int i = 1; i < int(parent->children.size()); i++) {
+        if (this == parent->children[i].get()) {
             row = i;
             break;
         }
@@ -59,6 +60,8 @@ ProjectItem *ProjectItem::parentItem()
 QString ProjectItem::toString() const
 {
     QString val("");
+    qDebug().noquote() << "Working with item" << this;
+    qDebug() << "There are this many items: " << itemData.count();
     for (int i = 0; i < itemData.count(); i++) {
         val.append(itemData.value(i).value<QString>());
         val.append(" -- ");

@@ -33,7 +33,7 @@ QModelIndex ProjectTreeModel::parent(const QModelIndex &index) const
     auto *childItem = static_cast<ProjectItem *>(index.internalPointer());
     ProjectItem *parentItem = childItem->parentItem();
     qDebug() << " Getting parents ==============================";
-    qDebug() << " Parent is" << parentItem->toString();
+    qDebug() << " Parent is" << parentItem;
 
     return parentItem != &rootItem ? createIndex(parentItem->row(), 0, parentItem) : QModelIndex{};
 }
@@ -116,8 +116,7 @@ void ProjectTreeModel::setupModelData(const QList<QStringView> &lines, ProjectIt
 
             // Append a new item to the current parent's list of children.
             auto *lastParent = state.constLast().parent;
-            ProjectItem item(columnData, lastParent);
-            lastParent->appendChildItem(item);
+            lastParent->appendChildItem(std::make_unique<ProjectItem>(columnData, lastParent));
         }
     }
 }
@@ -128,7 +127,7 @@ void ProjectTreeModel::printTree(ProjectItem *item, QString indent)
         return;
     }
 
-    qDebug().noquote() << indent << item->toString();
+    qDebug().noquote() << indent << item->toString() << item->row();
     int rows = item->childCount();
     indent.append("    ");
     for (int i = 0; i < rows; i++) {
