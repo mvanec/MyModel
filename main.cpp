@@ -1,5 +1,7 @@
 #include "ProjectTreeModel.h"
+#include "MainWindow.h"
 
+#include <QWidget>
 #include <QApplication>
 #include <QFile>
 #include <QScreen>
