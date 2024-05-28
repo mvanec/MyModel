@@ -6,10 +6,8 @@ ProjectItem::ProjectItem(QVariantList data, ProjectItem *parentItem)
 {}
 
 void ProjectItem::appendChildItem(std::unique_ptr<ProjectItem> &&child)
-//void ProjectItem::appendChildItem(ProjectItem *child)
 {
     children.push_back(std::move(child));
-    // children.append(child);
 }
 
 ProjectItem *ProjectItem::childItem(int row) const
@@ -43,12 +41,13 @@ int ProjectItem::row() const
     if (parent == nullptr)
         return row;
 
-    for (int i = 1; i < int(parent->children.size()); i++) {
-        if (this == parent->children[i].get()) {
-            row = i;
-            break;
-        }
-    }
+    auto it = find_if(parent->children.begin(),
+                      parent->children.end(),
+                      [this](const std::unique_ptr<ProjectItem> &treeItem) {
+                          return treeItem.get() == this;
+                      });
+    row = (it != parent->children.end()) ? distance(parent->children.begin(), it) : -1;
+
     return row;
 }
 

@@ -3,7 +3,7 @@
 
 ProjectTreeModel::ProjectTreeModel(const QString &data, QObject *parent)
     : QAbstractItemModel(parent)
-    , rootItem(QVariantList{tr("Title"), tr("Summary")})
+    , rootItem(QVariantList{tr("Year-Month"), tr("Day"), tr("Project")})
 {
     setupModelData(QStringView{data}.split(u'\n'), &rootItem);
     printTree(&rootItem, QString(""));
@@ -32,8 +32,6 @@ QModelIndex ProjectTreeModel::parent(const QModelIndex &index) const
 
     auto *childItem = static_cast<ProjectItem *>(index.internalPointer());
     ProjectItem *parentItem = childItem->parentItem();
-    qDebug() << " Getting parents ==============================";
-    qDebug() << " Parent is" << parentItem;
 
     return parentItem != &rootItem ? createIndex(parentItem->row(), 0, parentItem) : QModelIndex{};
 }
@@ -54,7 +52,8 @@ int ProjectTreeModel::columnCount(const QModelIndex &parent) const
 {
     if (parent.isValid())
         return static_cast<ProjectItem *>(parent.internalPointer())->columnCount();
-    return rootItem.columnCount();
+    return headers.count();
+    //return rootItem.columnCount();
 }
 
 QVariant ProjectTreeModel::data(const QModelIndex &index, int role) const
@@ -73,7 +72,9 @@ Qt::ItemFlags ProjectTreeModel::flags(const QModelIndex &index) const
 
 QVariant ProjectTreeModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
-    return orientation == Qt::Horizontal && role == Qt::DisplayRole ? rootItem.data(section)
+    // return orientation == Qt::Horizontal && role == Qt::DisplayRole ? rootItem.data(section)
+    //                                                                 : QVariant{};
+    return orientation == Qt::Horizontal && role == Qt::DisplayRole ? headers.at(section)
                                                                     : QVariant{};
 }
 

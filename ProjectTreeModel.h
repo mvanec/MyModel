@@ -24,6 +24,7 @@ public:
     int columnCount(const QModelIndex &parent = {}) const override;
 
 private:
+    QList<QString> headers = {"Year-Month", "Date", "Project", "Duration", "Pay"};
     static void setupModelData(const QList<QStringView> &lines, ProjectItem *parent);
     void printTree(ProjectItem *item, QString indent);
 
